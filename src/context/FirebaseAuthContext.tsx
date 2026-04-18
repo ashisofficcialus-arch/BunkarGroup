@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase/config';
+import { auth, isFirebaseConfigured, initializeFirebase } from '@/lib/firebase/config';
 import { currentUser } from '@/data/mockData';
 
 interface FirebaseAuthContextType {
@@ -20,12 +20,14 @@ const FirebaseAuthContext = createContext<FirebaseAuthContextType | undefined>(u
 export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFirebaseConfigured, setIsFirebaseConfigured] = useState(false);
+  const [isConfigured, setIsConfigured] = useState(false);
 
   useEffect(() => {
+    // Initialize Firebase
+    initializeFirebase();
+    
     // Check if Firebase is configured
-    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-    setIsFirebaseConfigured(!!apiKey && apiKey !== "demo-api-key");
+    setIsConfigured(isFirebaseConfigured());
 
     // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -37,7 +39,7 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    if (!isFirebaseConfigured) {
+    if (!isConfigured) {
       // Fallback to mock auth
       const mockUser = { ...currentUser, email };
       localStorage.setItem('bunkar_user', JSON.stringify(mockUser));
@@ -55,7 +57,7 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
   };
 
   const register = async (email: string, password: string): Promise<boolean> => {
-    if (!isFirebaseConfigured) {
+    if (!isConfigured) {
       // Fallback to mock auth
       const mockUser = { ...currentUser, email, id: `user-${Date.now()}` };
       localStorage.setItem('bunkar_user', JSON.stringify(mockUser));
@@ -73,8 +75,12 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    if (isFirebaseConfigured) {
-      await firebaseSignOut(auth);
+    if (isConfigured) {
+      try {
+        await firebaseSignOut(auth);
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
     }
     localStorage.removeItem('bunkar_user');
     localStorage.removeItem('bunkar_token');
@@ -85,7 +91,7 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
       user,
       isAuthenticated: !!user,
       isLoading,
-      isFirebaseConfigured,
+      isFirebaseConfigured: isConfigured,
       login,
       register,
       logout
