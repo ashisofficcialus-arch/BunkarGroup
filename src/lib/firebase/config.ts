@@ -5,13 +5,13 @@ import { getStorage, FirebaseStorage } from 'firebase/storage';
 import { getAnalytics, Analytics, isSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyCzEJnO7j99b4XKV8L-kbjOXId-7y3eXPQ",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "safecaller-a543f.firebaseapp.com",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "safecaller-a543f",
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "safecaller-a543f.firebasestorage.app",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "278843567867",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:278843567867:web:313c0ad9e71b6bf6870a5e",
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-FCW9YDM5WP"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "",
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || ""
 };
 
 let app: FirebaseApp;
@@ -22,6 +22,12 @@ let analytics: Analytics | null = null;
 
 export const initializeFirebase = () => {
   if (typeof window === 'undefined') return;
+  
+  // Don't initialize if no config
+  if (!isFirebaseConfigured()) {
+    console.log('Firebase not configured - using mock data');
+    return;
+  }
 
   try {
     if (!getApps().length) {
@@ -55,5 +61,5 @@ if (typeof window !== 'undefined') {
 export { app, auth, db, storage, analytics };
 
 export const isFirebaseConfigured = () => {
-  return !!firebaseConfig.apiKey && firebaseConfig.apiKey !== "demo-api-key";
+  return !!firebaseConfig.apiKey && firebaseConfig.apiKey.length > 0;
 };
