@@ -1,0 +1,13 @@
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.title {
+  display: none;
+}
+
+.feed {
+  display: flex;
+  flex-direction: column;
+}
