@@ -1,6 +1,7 @@
 .container {
   max-width: 680px;
   margin: 0 auto;
+  padding: 24px;
 }
 
 .header {
@@ -8,6 +9,7 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
+  gap: 16px;
 }
 
 .title {
@@ -18,7 +20,6 @@
 .tabs {
   display: flex;
   gap: 4px;
-  background: var(--bg-secondary);
   border-radius: var(--radius-full);
   padding: 4px;
 }
@@ -70,8 +71,15 @@
 }
 
 .postWrapper {
+  margin-bottom: 16px;
   animation: fadeInUp 0.3s ease-out forwards;
   opacity: 0;
+}
+
+.loadingFeed {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 @keyframes fadeInUp {
@@ -82,5 +90,20 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .tabs {
+    justify-content: center;
   }
 }
